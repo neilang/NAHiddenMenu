@@ -15,9 +15,10 @@
 @interface NAHiddenMenuController()
 @property (nonatomic, assign, readwrite) UIViewController *currentViewController;
 @property (nonatomic, copy, readwrite)   NSArray          *viewControllers;
+@property (nonatomic, retain)            UITableView      *tableView;
 @property (nonatomic, retain)            UIView           *proxyView;
 @property (nonatomic, retain)            UIView           *touchView;
-@property (nonatomic, assign, readwrite)  BOOL             isAnimating;
+@property (nonatomic, assign, readwrite) BOOL              isAnimating;
 @end
 
 
@@ -28,6 +29,7 @@
 @synthesize proxyView             = _proxyView;
 @synthesize touchView             = _touchView;
 @synthesize isAnimating           = _isAnimating;
+@synthesize tableView             = _tableView;
 
 - (id)initWithViewControllers:(NSArray *)viewControllers{
     
@@ -35,7 +37,7 @@
     
     self = [super init];
     if (self) {
-        
+
         self.currentViewController = nil;
         
         // Each viewController must have a UINavigationBar, so they are checked and added
@@ -74,11 +76,13 @@
         tableView.dataSource = self;
         tableView.delegate   = self;
         
-        [self.view addSubview:tableView];
+        self.tableView = tableView;
         
         #if !__has_feature(objc_arc)
         [tableView release];
         #endif
+
+        [self.view addSubview:self.tableView];
 
         // Add a proxy view to display the current view controllers view
         
@@ -108,6 +112,15 @@
         #endif
         
         [self.view addSubview:touchView];
+        
+        // Select the first row to fake the initial selection
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionTop];
+
+        // Load the first view controller, but also reveal the menu
+        UIViewController * vc = [self.viewControllers objectAtIndex:0];
+        [self setRootViewController:vc animated:NO];
+        [self showMenu:nil];
         
 
         
@@ -182,21 +195,13 @@
     
 }
 
-- (void)viewDidLoad {    
-    // Select the first item, and show the menu if nothing is currently selected
-//    if (self.currentViewController == nil) {
-//        UIViewController * vc = [self.viewControllers objectAtIndex:0];
-//        [self setRootViewController:vc animated:YES];
-//        [self showMenu:nil];
-//    }
-}
-
 #if !__has_feature(objc_arc)
 - (void)dealloc {
     
     [_viewControllers release]; _viewControllers = nil;
     [_proxyView release]; _proxyView = nil;
     [_touchView release]; _touchView = nil;
+    [_tableView release]; _tableView = nil;
     
     _currentViewController = nil;
     
