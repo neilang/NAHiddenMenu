@@ -6,11 +6,13 @@
 //
 
 #import "NAHiddenMenuController.h"
+#import <QuartzCore/QuartzCore.h>
 
-#define HIDDEN_MENU_WIDTH 270.0f 
+
+#define HIDDEN_MENU_WIDTH 280.0f 
 #define MENU_BAR_OFFSET 20.0
 #define REVEAL_ANIMATION_SPEED 0.4f
-
+#define PROXY_SHADOW_WIDTH 10.0
 
 @interface NAHiddenMenuController()
 @property (nonatomic, assign, readwrite) UIViewController *currentViewController;
@@ -90,7 +92,7 @@
         
         proxyViewFrame.origin.x = tableViewFrame.size.width;
         proxyViewFrame.size.height = proxyViewFrame.size.height + MENU_BAR_OFFSET;
-        proxyViewFrame.origin.y = MENU_BAR_OFFSET * -1;
+        proxyViewFrame.origin.y = -MENU_BAR_OFFSET;
         
         UIView *proxyView = [[UIView alloc] initWithFrame:proxyViewFrame];
         self.proxyView = proxyView;
@@ -99,7 +101,23 @@
         [proxyView release];
         #endif
         
-        // TODO: give the proxy view a shadow.
+        // Give the proxy view a subtle shadow
+        
+        CAGradientLayer *proxyShadow = [[CAGradientLayer alloc] init];
+        
+        proxyShadow.frame = CGRectMake(-PROXY_SHADOW_WIDTH, 0, PROXY_SHADOW_WIDTH, self.proxyView.frame.size.height);
+        
+        CGColorRef colour1 = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25].CGColor;
+        CGColorRef colour2 = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0].CGColor;
+        
+        proxyShadow.colors =[NSArray arrayWithObjects:(__bridge id)colour1, (__bridge id)colour2, nil];
+        proxyShadow.startPoint = CGPointMake(1, 1);
+        
+        [self.proxyView.layer addSublayer:proxyShadow];
+        
+        #if !__has_feature(objc_arc)
+        [proxyShadow release];
+        #endif
         
         [self.view addSubview:self.proxyView];
         

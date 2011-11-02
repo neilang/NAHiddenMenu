@@ -15,6 +15,7 @@
 		285A005C14615BB300EB3E4F /* NAAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A005B14615BB300EB3E4F /* NAAppDelegate.m */; };
 		285A006D14615C3000EB3E4F /* SampleTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A006C14615C3000EB3E4F /* SampleTableViewController.m */; };
 		285A007114615C4300EB3E4F /* NAHiddenMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A007014615C4300EB3E4F /* NAHiddenMenuController.m */; };
+		B3C5D16D146205F500FE661D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5D16C146205F500FE661D /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		285A006C14615C3000EB3E4F /* SampleTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleTableViewController.m; sourceTree = "<group>"; };
 		285A006F14615C4300EB3E4F /* NAHiddenMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NAHiddenMenuController.h; sourceTree = "<group>"; };
 		285A007014615C4300EB3E4F /* NAHiddenMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NAHiddenMenuController.m; sourceTree = "<group>"; };
+		B3C5D16C146205F500FE661D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +41,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3C5D16D146205F500FE661D /* QuartzCore.framework in Frameworks */,
 				285A004C14615BB300EB3E4F /* UIKit.framework in Frameworks */,
 				285A004E14615BB300EB3E4F /* Foundation.framework in Frameworks */,
 				285A005014615BB300EB3E4F /* CoreGraphics.framework in Frameworks */,
@@ -68,6 +71,7 @@
 		285A004A14615BB300EB3E4F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B3C5D16C146205F500FE661D /* QuartzCore.framework */,
 				285A004B14615BB300EB3E4F /* UIKit.framework */,
 				285A004D14615BB300EB3E4F /* Foundation.framework */,
 				285A004F14615BB300EB3E4F /* CoreGraphics.framework */,
