@@ -7,4 +7,4 @@ It will run on the iPhone and iPad, and supports both ARC and non-ARC builds.
 Feel free to fork this code and lend a hand.
 
 
-!screenshot1.png! !screenshot2.png!
+!//github.com/neilang/NAHiddenMenu/raw/master/screenshot1.png! !//github.com/neilang/NAHiddenMenu/raw/master/screenshot2.png!
