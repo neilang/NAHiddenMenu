@@ -13,6 +13,7 @@
 @property (nonatomic, assign, readonly) UIViewController *currentViewController;
 @property (nonatomic, copy, readonly)   NSArray          *viewControllers;
 @property (nonatomic, assign, readonly) BOOL              isAnimating;
+@property (nonatomic, assign, readonly) BOOL              isMenuVisible;
 
 - (id)initWithViewControllers:(NSArray *)viewControllers;
 - (IBAction)showMenu:(id)sender;

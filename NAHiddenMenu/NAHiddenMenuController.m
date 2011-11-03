@@ -21,6 +21,7 @@
 @property (nonatomic, retain)            UIView           *proxyView;
 @property (nonatomic, retain)            UIView           *touchView;
 @property (nonatomic, assign, readwrite) BOOL              isAnimating;
+@property (nonatomic, assign, readwrite) BOOL              isMenuVisible;
 @end
 
 
@@ -31,6 +32,7 @@
 @synthesize proxyView             = _proxyView;
 @synthesize touchView             = _touchView;
 @synthesize isAnimating           = _isAnimating;
+@synthesize isMenuVisible         = _isMenuVisible;
 @synthesize tableView             = _tableView;
 
 - (id)initWithViewControllers:(NSArray *)viewControllers{
@@ -39,7 +41,7 @@
     
     self = [super init];
     if (self) {
-
+        
         self.currentViewController = nil;
         
         // Each viewController must have a UINavigationBar, so they are checked and added
@@ -55,7 +57,7 @@
                 [navController release];
                 #endif
             }
-            
+                        
             // TODO: change this icon
             viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(showMenu:)];
         }
@@ -132,6 +134,8 @@
         [self.view addSubview:touchView];
         
         // Select the first row to fake the initial selection
+        self.isMenuVisible = NO;
+        self.isAnimating   = NO;
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
         [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionTop];
 
@@ -140,16 +144,36 @@
         [self setRootViewController:vc animated:NO];
         [self showMenu:nil];
         
-
-        
     }
     return self;
+}
+
+-(void)viewDidLoad{
+    
+    // Add Left swipe gesture
+    UISwipeGestureRecognizer *leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(hideMenu:)];
+    leftSwipe.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.view addGestureRecognizer:leftSwipe];
+    #if !__has_feature(objc_arc)
+    [leftSwipe release];
+    #endif
+    
+    // Add right swipe gesture
+    UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(showMenu:)];
+    rightSwipe.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:rightSwipe];
+    #if !__has_feature(objc_arc)
+    [rightSwipe release];
+    #endif
 }
 
 - (IBAction)showMenu:(id)sender{
     
     if(self.isAnimating) return;
-    self.isAnimating = YES;
+    if(self.isMenuVisible) return;
+    
+    self.isAnimating   = YES;
+    self.isMenuVisible = YES;
     
     self.touchView.hidden = NO;
     
@@ -165,7 +189,11 @@
 - (IBAction)hideMenu:(id)sender{
 
     if(self.isAnimating) return;
-    self.isAnimating = YES;
+    if(!self.isMenuVisible) return;
+
+    self.isMenuVisible = NO;
+    self.isAnimating   = YES;
+
     
     self.touchView.hidden = YES;
     
