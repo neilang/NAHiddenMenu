@@ -107,12 +107,8 @@
         
         CAGradientLayer *proxyShadow = [[CAGradientLayer alloc] init];
         
-        proxyShadow.frame = CGRectMake(-PROXY_SHADOW_WIDTH, 0, PROXY_SHADOW_WIDTH, self.proxyView.frame.size.height);
-        
-        CGColorRef colour1 = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25].CGColor;
-        CGColorRef colour2 = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0].CGColor;
-        
-        proxyShadow.colors =[NSArray arrayWithObjects:(__bridge id)colour1, (__bridge id)colour2, nil];
+        proxyShadow.frame      = CGRectMake(-PROXY_SHADOW_WIDTH, 0, PROXY_SHADOW_WIDTH, self.proxyView.frame.size.height);
+        proxyShadow.colors     = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor], (id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0] CGColor], nil];
         proxyShadow.startPoint = CGPointMake(1, 1);
         
         [self.proxyView.layer addSublayer:proxyShadow];
