@@ -12,6 +12,7 @@
 #define HIDDEN_MENU_WIDTH 280.0f 
 #define MENU_BAR_OFFSET 20.0
 #define REVEAL_ANIMATION_SPEED 0.4f
+#define HIDE_MENU_DELAY 0.3f
 #define PROXY_SHADOW_WIDTH 10.0
 
 @interface NAHiddenMenuController()
@@ -193,7 +194,10 @@
     
     self.touchView.hidden = YES;
     
-    [UIView animateWithDuration:REVEAL_ANIMATION_SPEED animations:^{
+    // When closing the menu there should only be a delay when a new table row is selected
+    float delay = sender == self.tableView ? HIDE_MENU_DELAY : 0.0;
+    
+    [UIView animateWithDuration:REVEAL_ANIMATION_SPEED delay:delay options:UIViewAnimationCurveLinear animations:^{
         CGRect frame = self.proxyView.frame;
         frame.origin.x = 0.0f;
         self.proxyView.frame = frame;
@@ -203,6 +207,8 @@
 }
 
 - (void)setRootViewController:(UIViewController *)viewController animated:(BOOL)animated{
+    
+    id sender = nil; 
     
     if (viewController != self.currentViewController) {
         
@@ -224,10 +230,13 @@
         
         // Keep a reference to the current vc
         self.currentViewController = viewController;
+        
+        // Assume that this was set by selecting a new row in the menu
+        sender = self.tableView;
     }
     
     if(animated){
-        [self hideMenu:nil];
+        [self hideMenu:sender];
     }
     else{
         CGRect frame = self.proxyView.frame;
@@ -307,3 +316,5 @@
 #undef HIDDEN_MENU_WIDTH
 #undef MENU_BAR_OFFSET
 #undef REVEAL_ANIMATION_SPEED
+#undef PROXY_SHADOW_WIDTH
+#undef HIDE_MENU_DELAY
