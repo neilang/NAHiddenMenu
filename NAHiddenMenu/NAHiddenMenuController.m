@@ -12,14 +12,14 @@
 #define HIDDEN_MENU_WIDTH 280.0f 
 #define MENU_BAR_OFFSET 20.0
 #define REVEAL_ANIMATION_SPEED 0.4f
-#define HIDE_MENU_DELAY 0.3f
-#define PROXY_SHADOW_WIDTH 10.0
+#define HIDE_MENU_DELAY 0.2f
+#define CONTAINER_SHADOW_WIDTH 10.0
 
 @interface NAHiddenMenuController()
 @property (nonatomic, assign, readwrite) UIViewController *currentViewController;
 @property (nonatomic, copy, readwrite)   NSArray          *viewControllers;
 @property (nonatomic, retain)            UITableView      *tableView;
-@property (nonatomic, retain)            UIView           *proxyView;
+@property (nonatomic, retain)            UIView           *containerView;
 @property (nonatomic, retain)            UIView           *touchView;
 @property (nonatomic, assign, readwrite) BOOL              isAnimating;
 @property (nonatomic, assign, readwrite) BOOL              isMenuVisible;
@@ -30,7 +30,7 @@
 
 @synthesize currentViewController = _currentViewController;
 @synthesize viewControllers       = _viewControllers;
-@synthesize proxyView             = _proxyView;
+@synthesize containerView         = _containerView;
 @synthesize touchView             = _touchView;
 @synthesize isAnimating           = _isAnimating;
 @synthesize isMenuVisible         = _isMenuVisible;
@@ -89,39 +89,39 @@
 
         [self.view addSubview:self.tableView];
 
-        // Add a proxy view to display the current view controllers view
+        // Add a container view to display the current view controllers view
         
-        CGRect proxyViewFrame = self.view.frame;
+        CGRect containerViewFrame = self.view.frame;
         
-        proxyViewFrame.origin.x = tableViewFrame.size.width;
-        proxyViewFrame.size.height = proxyViewFrame.size.height + MENU_BAR_OFFSET;
-        proxyViewFrame.origin.y = -MENU_BAR_OFFSET;
+        containerViewFrame.origin.x = tableViewFrame.size.width;
+        containerViewFrame.size.height = containerViewFrame.size.height + MENU_BAR_OFFSET;
+        containerViewFrame.origin.y = -MENU_BAR_OFFSET;
         
-        UIView *proxyView = [[UIView alloc] initWithFrame:proxyViewFrame];
-        self.proxyView = proxyView;
-        
-        #if !__has_feature(objc_arc)
-        [proxyView release];
-        #endif
-        
-        // Give the proxy view a subtle shadow
-        
-        CAGradientLayer *proxyShadow = [[CAGradientLayer alloc] init];
-        
-        proxyShadow.frame      = CGRectMake(-PROXY_SHADOW_WIDTH, 0, PROXY_SHADOW_WIDTH, self.proxyView.frame.size.height);
-        proxyShadow.colors     = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor], (id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0] CGColor], nil];
-        proxyShadow.startPoint = CGPointMake(1, 1);
-        
-        [self.proxyView.layer addSublayer:proxyShadow];
+        UIView *containerView = [[UIView alloc] initWithFrame:containerViewFrame];
+        self.containerView = containerView;
         
         #if !__has_feature(objc_arc)
-        [proxyShadow release];
+        [containerView release];
         #endif
         
-        [self.view addSubview:self.proxyView];
+        // Give the container view a subtle shadow
+        
+        CAGradientLayer *containerShadow = [[CAGradientLayer alloc] init];
+        
+        containerShadow.frame      = CGRectMake(-CONTAINER_SHADOW_WIDTH, 0, CONTAINER_SHADOW_WIDTH, self.containerView.frame.size.height);
+        containerShadow.colors     = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor], (id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0] CGColor], nil];
+        containerShadow.startPoint = CGPointMake(1, 1);
+        
+        [self.containerView.layer addSublayer:containerShadow];
+        
+        #if !__has_feature(objc_arc)
+        [containerShadow release];
+        #endif
+        
+        [self.view addSubview:self.containerView];
         
         // Setup a touch mask for when the menu is visible
-        NAHiddenMenuTouchView *touchView = [[NAHiddenMenuTouchView alloc] initWithFrame:self.proxyView.frame];
+        NAHiddenMenuTouchView *touchView = [[NAHiddenMenuTouchView alloc] initWithFrame:self.containerView.frame];
         touchView.hiddenMenuController = self;
         self.touchView = touchView;
         #if !__has_feature(objc_arc)
@@ -175,9 +175,9 @@
     self.touchView.hidden = NO;
     
     [UIView animateWithDuration:REVEAL_ANIMATION_SPEED animations:^{
-        CGRect frame = self.proxyView.frame;
+        CGRect frame = self.containerView.frame;
         frame.origin.x = HIDDEN_MENU_WIDTH;
-        self.proxyView.frame = frame;
+        self.containerView.frame = frame;
     } completion:^(BOOL finished){
         self.isAnimating = NO;
     }];
@@ -198,9 +198,9 @@
     float delay = sender == self.tableView ? HIDE_MENU_DELAY : 0.0;
     
     [UIView animateWithDuration:REVEAL_ANIMATION_SPEED delay:delay options:UIViewAnimationCurveLinear animations:^{
-        CGRect frame = self.proxyView.frame;
+        CGRect frame = self.containerView.frame;
         frame.origin.x = 0.0f;
-        self.proxyView.frame = frame;
+        self.containerView.frame = frame;
     } completion:^(BOOL finished){
         self.isAnimating = NO;
     }];
@@ -216,7 +216,7 @@
         
         [self.currentViewController viewWillDisappear:animated];
         
-        for (UIView *view in self.proxyView.subviews) {
+        for (UIView *view in self.containerView.subviews) {
             [view removeFromSuperview];
         }
         
@@ -225,7 +225,7 @@
         // Add the new subview
         
         [viewController viewWillAppear:YES];
-        [self.proxyView addSubview:viewController.view];
+        [self.containerView addSubview:viewController.view];
         [viewController viewDidAppear:YES];
         
         // Keep a reference to the current vc
@@ -239,9 +239,9 @@
         [self hideMenu:sender];
     }
     else{
-        CGRect frame = self.proxyView.frame;
+        CGRect frame = self.containerView.frame;
         frame.origin.x = 0.0f;
-        self.proxyView.frame = frame;
+        self.containerView.frame = frame;
     }
     
 }
@@ -250,7 +250,7 @@
 - (void)dealloc {
     
     [_viewControllers release]; _viewControllers = nil;
-    [_proxyView release]; _proxyView = nil;
+    [_containerView release]; _containerView = nil;
     [_touchView release]; _touchView = nil;
     [_tableView release]; _tableView = nil;
     
@@ -316,5 +316,5 @@
 #undef HIDDEN_MENU_WIDTH
 #undef MENU_BAR_OFFSET
 #undef REVEAL_ANIMATION_SPEED
-#undef PROXY_SHADOW_WIDTH
+#undef CONTAINER_SHADOW_WIDTH
 #undef HIDE_MENU_DELAY
