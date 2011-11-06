@@ -77,6 +77,7 @@
         tableViewFrame.size.width = HIDDEN_MENU_WIDTH;
         
         UITableView *tableView = [[UITableView alloc] initWithFrame:tableViewFrame];
+        tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
         tableView.dataSource = self;
         tableView.delegate   = self;
@@ -99,6 +100,7 @@
         
         UIView *containerView = [[UIView alloc] initWithFrame:containerViewFrame];
         self.containerView = containerView;
+        self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
         #if !__has_feature(objc_arc)
         [containerView release];
@@ -292,6 +294,15 @@
     [self setRootViewController:vc animated:YES];
 }
 
+#pragma mark - UIViewControllerRotation
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)	{
+		return interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;
+	} else {
+		return YES;
+	}
+}
 
 @end
 
