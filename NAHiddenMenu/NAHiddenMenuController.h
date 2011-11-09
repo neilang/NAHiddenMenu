@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "NAHiddenMenuDelegate.h"
 
 @interface NAHiddenMenuController : UIViewController<UITableViewDelegate, UITableViewDataSource>
 
@@ -14,9 +15,12 @@
 @property (nonatomic, assign, readonly) BOOL              isAnimating;
 @property (nonatomic, assign, readonly) BOOL              isMenuVisible;
 
-- (id)initWithViewControllers:(NSArray *)viewControllers;
+// Delegate for the table view and data source.
+@property (nonatomic, retain) id<NAHiddenMenuDelegate>    hiddenMenuDelegate;
+
+- (id)initWithDelegate:(id<NAHiddenMenuDelegate>)delegate;
 - (IBAction)showMenu:(id)sender;
--(IBAction)hideMenu:(id)sender;
+- (IBAction)hideMenu:(id)sender;
 - (void)hideMenuWithDelay:(NSTimeInterval)delay;
 - (void)setRootViewController:(UIViewController *)viewController;
 

@@ -34,30 +34,20 @@
 @synthesize isAnimating           = _isAnimating;
 @synthesize isMenuVisible         = _isMenuVisible;
 @synthesize tableView             = _tableView;
+@synthesize hiddenMenuDelegate    = _hiddenMenuDelegate;
 
-- (id)initWithViewControllers:(NSArray *)viewControllers{
-    
-    assert([viewControllers count] > 0);
+- (id)initWithDelegate:(id<NAHiddenMenuDelegate>)delegate {
     
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
-        
+        self.hiddenMenuDelegate    = delegate;
         self.currentViewController = nil;
-        
-        // Make each view controller a child of this view controller
-        for (UIViewController *viewController in viewControllers) {
-            [self addChildViewController:viewController];
-            [viewController didMoveToParentViewController:self];
-            
-            CGRect frame = viewController.view.frame;
-            frame.origin = CGPointZero;
-            viewController.view.frame = frame;
-        }
-        
-        // Add the table view (which will display the menu)
-        CGRect tableViewFrame = self.view.frame;
-        tableViewFrame.origin.x = 0.0f;
-        tableViewFrame.origin.y = 0.0f;
+        self.isMenuVisible         = YES;
+        self.isAnimating           = NO;
+
+        // Setup the menu table view
+        CGRect tableViewFrame     = self.view.frame;
+        tableViewFrame.origin     = CGPointZero;
         tableViewFrame.size.width = HIDDEN_MENU_WIDTH;
         
         UITableView *tableView     = [[UITableView alloc] initWithFrame:tableViewFrame];
@@ -67,24 +57,22 @@
         tableView.delegate   = self;
         
         self.tableView = tableView;
-
-        [self.view addSubview:self.tableView];
-
         
-        // Add a container view to display the current view controllers view
+        [self.view addSubview:self.tableView];
+        
+        // Setup the container view which will hold the child view controllers view
         CGRect containerViewFrame   = self.view.frame;
         containerViewFrame.origin   = CGPointZero;
         containerViewFrame.origin.x = HIDDEN_MENU_WIDTH;
         
         UIView *containerView = [[UIView alloc] initWithFrame:containerViewFrame];
+        containerView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        containerView.autoresizesSubviews = YES;
+        
         self.containerView = containerView;
-        self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.containerView.autoresizesSubviews = YES;
-        self.containerView.backgroundColor = [UIColor yellowColor];
         
-        // Give the container view a subtle shadow
+        // The container view also needs a subtle shadow
         CAGradientLayer *containerShadow = [[CAGradientLayer alloc] init];
-        
         containerShadow.frame      = CGRectMake(-CONTAINER_SHADOW_WIDTH, 0, CONTAINER_SHADOW_WIDTH, self.containerView.frame.size.height);
         containerShadow.colors     = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor], (id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0] CGColor], nil];
         containerShadow.startPoint = CGPointMake(1, 1);
@@ -92,33 +80,31 @@
         [self.containerView.layer addSublayer:containerShadow];
         [self.view addSubview:self.containerView];
         
-        // Setup a touch mask for when the menu is visible
+        // Setup the touch mask for when the menu is visible
         NAHiddenMenuTouchView *touchView = [[NAHiddenMenuTouchView alloc] initWithFrame:self.containerView.frame];
-        touchView.hiddenMenuController = self;
-        self.touchView = touchView;
+        touchView.hiddenMenuController   = self;
+        self.touchView                   = touchView;
         
         [self.view addSubview:touchView];
         
-        self.isMenuVisible = YES;
-        self.isAnimating   = NO;
+        // Set the default view controller
+        CGRect frame = self.containerView.frame;
+        frame.origin = CGPointZero;
+        UIViewController * viewController = [self.hiddenMenuDelegate defualtViewController];
+        viewController.view.frame         = frame;
+        
+        [self addChildViewController:viewController];
+        [viewController didMoveToParentViewController:self];
+        
+        [viewController viewWillAppear:NO];
+        [self.containerView addSubview:viewController.view];
+        [viewController viewDidAppear:NO];
+        self.currentViewController = viewController;
 
-        // Load the first view controller
-        UIViewController * vc = [self.childViewControllers objectAtIndex:0];
-        [vc viewWillAppear:NO];
-        [self.containerView addSubview:vc.view];
-        [vc viewDidAppear:NO];
-        
-        self.currentViewController = vc;
-        
-        // Select the first row to fake the initial selection
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-        [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionTop];
         
     }
     return self;
 }
-
-
 
 -(void)viewDidLoad{
     
@@ -134,6 +120,9 @@
 }
 
 - (IBAction)showMenu:(id)sender{
+    
+    // TODO: Only show the menu if we are showing the root view controllers main view
+    
     
     if(self.isAnimating) return;
     if(self.isMenuVisible) return;
@@ -164,7 +153,7 @@
     
     [UIView animateWithDuration:REVEAL_ANIMATION_SPEED delay:delay options:UIViewAnimationCurveLinear animations:^{
         CGRect frame = self.containerView.frame;
-        frame.origin.x = 0.0f;
+        frame.origin = CGPointZero;
         self.containerView.frame = frame;
     } completion:^(BOOL finished){
         self.isAnimating = NO;
@@ -177,59 +166,66 @@
 
 - (void)setRootViewController:(UIViewController *)viewController{
     
+    // Add the view controller as a child
+    
     if (viewController == self.currentViewController) {
         [self hideMenu:nil];
         return;
     }
     
-    // Reset the view frame
-    CGRect frame = self.currentViewController.view.frame;
+    [self addChildViewController:viewController];
+    [viewController didMoveToParentViewController:self];
+    
+    // Reset the frame view
+    CGRect frame = self.containerView.frame;
     frame.origin = CGPointZero;
     viewController.view.frame = frame;
     
     // Perform the view transition
     [self transitionFromViewController:self.currentViewController toViewController:viewController duration:0.0f options:UIViewAnimationOptionTransitionNone animations:nil completion:^(BOOL finished){
+        
+        // Remove the old viewcontroller
+        [self.currentViewController willMoveToParentViewController:nil];
+        [self.currentViewController removeFromParentViewController];
+        
+        // Reset the pointer and hide the menu
         self.currentViewController = viewController;
-        [self hideMenuWithDelay:HIDE_MENU_DELAY]; // hide the menu with delay
+        [self hideMenuWithDelay:HIDE_MENU_DELAY];
     }];
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+        
+    if ([self.hiddenMenuDelegate respondsToSelector:@selector(numberOfSectionsInTableView:)]) {
+        [self.hiddenMenuDelegate performSelector:@selector(numberOfSectionsInTableView:) withObject:tableView];
+    }
+    
     return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.childViewControllers count];
+    return [self.hiddenMenuDelegate tableView:tableView numberOfRowsInSection:section];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *CellIdentifier = @"HiddenMenuCell";
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-    }
-    
-    UIViewController *vc = (UIViewController *)[self.childViewControllers objectAtIndex:indexPath.row];
-    cell.textLabel.text = vc.title;
-    
-    return cell;
+    return [self.hiddenMenuDelegate tableView:tableView cellForRowAtIndexPath:indexPath];
 }
 
 
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UIViewController *vc = (UIViewController *)[self.childViewControllers objectAtIndex:indexPath.row];  
+    UIViewController *viewController = [self.hiddenMenuDelegate tableView:tableView viewControllerForRowAtIndexPath:indexPath];
     
-    [self setRootViewController:vc];
-    
+    if (viewController) {
+        [self setRootViewController:viewController];
+    }
 }
 
 #pragma mark - UIViewControllerRotation
-
+// Move this to delegate??
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
 	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)	{
 		return interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown;

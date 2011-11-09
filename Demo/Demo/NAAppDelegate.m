@@ -8,8 +8,7 @@
 
 #import "NAAppDelegate.h"
 #import "NAHiddenMenuController.h"
-#import "SampleTableViewController.h"
-#import "SampleViewController.h"
+#import "MainMenu.h"
 
 @implementation NAAppDelegate
 
@@ -19,35 +18,11 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
+    // Implement your NAHiddenMenuController here
+    MainMenu *menu  = [[MainMenu alloc] init];
+    NAHiddenMenuController *hiddenMenuController = [[NAHiddenMenuController alloc] initWithDelegate:menu];
     
-    // Create the hidden menu controller
-    NAHiddenMenuController * rootViewController;
-    
-    SampleViewController * sample1 = [[SampleViewController alloc] init];
-    sample1.title = @"Sample 1";
-    sample1.view.backgroundColor = [UIColor redColor];
-    sample1.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:rootViewController action:@selector(showMenu:)];
-
-    UINavigationController * sample1NavController = [[UINavigationController alloc] initWithRootViewController:sample1];
-    
-    SampleViewController * sample2 = [[SampleViewController alloc] init];
-    sample2.title = @"Sample 2";
-    sample2.view.backgroundColor = [UIColor blueColor];
-    sample2.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:rootViewController action:@selector(showMenu:)];
-    
-    UINavigationController * sample2NavController = [[UINavigationController alloc] initWithRootViewController:sample2];
-   
-    // Create a sample table
-    SampleTableViewController * sampleTable = [[SampleTableViewController alloc] init];
-    sampleTable.title = @"Sample Table";
-    sampleTable.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:rootViewController action:@selector(showMenu:)];
-    
-    UINavigationController * tableNavController = [[UINavigationController alloc] initWithRootViewController:sampleTable];
-    
-    NSArray * viewControllers = [NSArray arrayWithObjects:sample1NavController, sample2NavController, tableNavController, nil];
-    rootViewController        = [[NAHiddenMenuController alloc] initWithViewControllers:viewControllers];
-    
-    self.window.rootViewController = rootViewController;
+    self.window.rootViewController = hiddenMenuController;
     [self.window makeKeyAndVisible];
     return YES;
 }
