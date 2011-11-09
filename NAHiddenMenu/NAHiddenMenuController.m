@@ -67,10 +67,6 @@
         tableView.delegate   = self;
         
         self.tableView = tableView;
-        
-        #if !__has_feature(objc_arc)
-        [tableView release];
-        #endif
 
         [self.view addSubview:self.tableView];
 
@@ -86,11 +82,6 @@
         self.containerView.autoresizesSubviews = YES;
         self.containerView.backgroundColor = [UIColor yellowColor];
         
-        
-        #if !__has_feature(objc_arc)
-        [containerView release];
-        #endif
-        
         // Give the container view a subtle shadow
         CAGradientLayer *containerShadow = [[CAGradientLayer alloc] init];
         
@@ -99,20 +90,12 @@
         containerShadow.startPoint = CGPointMake(1, 1);
         
         [self.containerView.layer addSublayer:containerShadow];
-        
-        #if !__has_feature(objc_arc)
-        [containerShadow release];
-        #endif
-        
         [self.view addSubview:self.containerView];
         
         // Setup a touch mask for when the menu is visible
         NAHiddenMenuTouchView *touchView = [[NAHiddenMenuTouchView alloc] initWithFrame:self.containerView.frame];
         touchView.hiddenMenuController = self;
         self.touchView = touchView;
-        #if !__has_feature(objc_arc)
-        [touchView release];
-        #endif
         
         [self.view addSubview:touchView];
         
@@ -143,17 +126,11 @@
     UISwipeGestureRecognizer *leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(hideMenu:)];
     leftSwipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:leftSwipe];
-    #if !__has_feature(objc_arc)
-    [leftSwipe release];
-    #endif
     
     // Add right swipe gesture
     UISwipeGestureRecognizer *rightSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(showMenu:)];
     rightSwipe.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:rightSwipe];
-    #if !__has_feature(objc_arc)
-    [rightSwipe release];
-    #endif
 }
 
 - (IBAction)showMenu:(id)sender{
@@ -184,8 +161,6 @@
     self.isAnimating   = YES;
     
     self.touchView.hidden = YES;
-    
-    // When closing the menu there should only be a delay when a new table row is selected
     
     [UIView animateWithDuration:REVEAL_ANIMATION_SPEED delay:delay options:UIViewAnimationCurveLinear animations:^{
         CGRect frame = self.containerView.frame;
@@ -218,19 +193,6 @@
         [self hideMenuWithDelay:HIDE_MENU_DELAY]; // hide the menu with delay
     }];
 }
-
-#if !__has_feature(objc_arc)
-- (void)dealloc {
-    
-    [_containerView release]; _containerView = nil;
-    [_touchView release]; _touchView = nil;
-    [_tableView release]; _tableView = nil;
-    
-    _currentViewController = nil;
-    
-    [super dealloc];
-}
-#endif
 
 #pragma mark - Table view data source
 
@@ -286,13 +248,6 @@
     [self.superview touchesBegan:touches withEvent:event];
     [self.hiddenMenuController hideMenu:nil];
 }
-
-#if !__has_feature(objc_arc)
-- (void)dealloc {
-    _hiddenMenuController = nil;
-    [super dealloc];
-}
-#endif
 
 @end
 

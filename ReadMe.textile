@@ -2,7 +2,7 @@ h1. NAHiddenMenu
 
 This is my attempt at a hidden sidebar menu control for iOS, similar to the one available in the Facebook App.
 
-It will run on the iPhone and iPad, and supports both ARC and non-ARC builds.
+It will run on the iPhone and iPad, and requires iOS5 and ARC.
 
 Feel free to fork this code and lend a hand.
 
