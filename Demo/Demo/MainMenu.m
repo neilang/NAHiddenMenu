@@ -19,14 +19,18 @@
         
         UIViewController *viewController1 = [[UIViewController alloc] initWithNibName:nil bundle:nil];
         viewController1.view.backgroundColor = [UIColor blueColor];
-
+        viewController1.title = @"Example 1";
+        UINavigationController *viewController1NavController = [[UINavigationController alloc] initWithRootViewController:viewController1];
+        
         UIViewController *viewController2 = [[UIViewController alloc] initWithNibName:nil bundle:nil];
         viewController2.view.backgroundColor = [UIColor redColor];
+        viewController2.title = @"Example 2";
+        UINavigationController *viewController2NavController = [[UINavigationController alloc] initWithRootViewController:viewController2];
         
         SampleTableViewController *tableViewController = [[SampleTableViewController alloc] initWithNibName:nil bundle:nil];
         UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:tableViewController];
         
-        self.viewControllers = [NSArray arrayWithObjects:viewController1, viewController2, navController, nil];
+        self.viewControllers = [NSArray arrayWithObjects:viewController1NavController, viewController2NavController, navController, nil];
         
     }
     return self;
@@ -48,7 +52,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    cell.textLabel.text = [NSString stringWithFormat:@"Example %d", indexPath.row];
+    cell.textLabel.text = [NSString stringWithFormat:@"Example %d", indexPath.row+1];
     
     return cell;
 }

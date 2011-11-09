@@ -19,7 +19,7 @@
 
 @interface NAHiddenMenuController()
 @property (nonatomic, assign, readwrite) UIViewController *currentViewController;
-@property (nonatomic, retain)            UITableView      *tableView;
+@property (nonatomic, retain, readwrite) UITableView      *tableView;
 @property (nonatomic, retain)            UIView           *containerView;
 @property (nonatomic, retain)            UIView           *touchView;
 @property (nonatomic, assign, readwrite) BOOL              isAnimating;
@@ -65,7 +65,7 @@
         containerViewFrame.origin   = CGPointZero;
         containerViewFrame.origin.x = HIDDEN_MENU_WIDTH;
         
-        UIView *containerView = [[UIView alloc] initWithFrame:containerViewFrame];
+        UIView *containerView             = [[UIView alloc] initWithFrame:containerViewFrame];
         containerView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         containerView.autoresizesSubviews = YES;
         
@@ -73,9 +73,9 @@
         
         // The container view also needs a subtle shadow
         CAGradientLayer *containerShadow = [[CAGradientLayer alloc] init];
-        containerShadow.frame      = CGRectMake(-CONTAINER_SHADOW_WIDTH, 0, CONTAINER_SHADOW_WIDTH, self.containerView.frame.size.height);
-        containerShadow.colors     = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor], (id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0] CGColor], nil];
-        containerShadow.startPoint = CGPointMake(1, 1);
+        containerShadow.frame            = CGRectMake(-CONTAINER_SHADOW_WIDTH, 0, CONTAINER_SHADOW_WIDTH, self.containerView.frame.size.height);
+        containerShadow.colors           = [NSArray arrayWithObjects:(id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.25] CGColor], (id)[[UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0] CGColor], nil];
+        containerShadow.startPoint       = CGPointMake(1, 1);
         
         [self.containerView.layer addSublayer:containerShadow];
         [self.view addSubview:self.containerView];
@@ -95,12 +95,11 @@
         
         [self addChildViewController:viewController];
         [viewController didMoveToParentViewController:self];
-        
+
         [viewController viewWillAppear:NO];
         [self.containerView addSubview:viewController.view];
         [viewController viewDidAppear:NO];
         self.currentViewController = viewController;
-
         
     }
     return self;
@@ -120,10 +119,7 @@
 }
 
 - (IBAction)showMenu:(id)sender{
-    
-    // TODO: Only show the menu if we are showing the root view controllers main view
-    
-    
+        
     if(self.isAnimating) return;
     if(self.isMenuVisible) return;
     
@@ -175,7 +171,7 @@
     
     [self addChildViewController:viewController];
     [viewController didMoveToParentViewController:self];
-    
+        
     // Reset the frame view
     CGRect frame = self.containerView.frame;
     frame.origin = CGPointZero;

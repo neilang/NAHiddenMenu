@@ -19,6 +19,8 @@
 // The default view controller to show on startup. This cannot be nil.
 -(UIViewController *)defualtViewController;
 
+@optional
+
 // Re-implementation of UITableViewDataSource protocol
 @required
 

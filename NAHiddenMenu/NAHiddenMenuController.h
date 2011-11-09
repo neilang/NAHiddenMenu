@@ -14,6 +14,7 @@
 @property (nonatomic, assign, readonly) UIViewController *currentViewController;
 @property (nonatomic, assign, readonly) BOOL              isAnimating;
 @property (nonatomic, assign, readonly) BOOL              isMenuVisible;
+@property (nonatomic, retain, readonly) UITableView      *tableView;
 
 // Delegate for the table view and data source.
 @property (nonatomic, retain) id<NAHiddenMenuDelegate>    hiddenMenuDelegate;
