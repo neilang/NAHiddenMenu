@@ -3,7 +3,7 @@
 //  Demo
 //
 //  Created by Neil Ang on 9/11/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 neilang.com. All rights reserved.
 //
 
 #import "MainMenu.h"
@@ -18,12 +18,12 @@
     if (self) {
         
         UIViewController *viewController1 = [[UIViewController alloc] initWithNibName:nil bundle:nil];
-        viewController1.view.backgroundColor = [UIColor blueColor];
+        viewController1.view.backgroundColor = [UIColor redColor];
         viewController1.title = @"Example 1";
         UINavigationController *viewController1NavController = [[UINavigationController alloc] initWithRootViewController:viewController1];
         
         UIViewController *viewController2 = [[UIViewController alloc] initWithNibName:nil bundle:nil];
-        viewController2.view.backgroundColor = [UIColor redColor];
+        viewController2.view.backgroundColor = [UIColor blueColor];
         viewController2.title = @"Example 2";
         UINavigationController *viewController2NavController = [[UINavigationController alloc] initWithRootViewController:viewController2];
         

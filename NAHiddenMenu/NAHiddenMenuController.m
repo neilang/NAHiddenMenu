@@ -86,27 +86,31 @@
         self.touchView                   = touchView;
         
         [self.view addSubview:touchView];
-        
-        // Set the default view controller
-        CGRect frame = self.containerView.frame;
-        frame.origin = CGPointZero;
-        UIViewController * viewController = [self.hiddenMenuDelegate defualtViewController];
-        viewController.view.frame         = frame;
-        
-        [self addChildViewController:viewController];
-        [viewController didMoveToParentViewController:self];
-
-        [viewController viewWillAppear:NO];
-        [self.containerView addSubview:viewController.view];
-        [viewController viewDidAppear:NO];
-        self.currentViewController = viewController;
-        
+                
     }
     return self;
 }
 
--(void)viewDidLoad{
+-(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     
+    // Set the default view controller
+    CGRect frame = self.containerView.frame;
+    frame.origin = CGPointZero;
+    UIViewController * viewController = [self.hiddenMenuDelegate defualtViewController];
+    viewController.view.frame         = frame;
+    
+    [self addChildViewController:viewController];
+    [viewController didMoveToParentViewController:self];
+    
+    [viewController viewWillAppear:NO];
+    [self.containerView addSubview:viewController.view];
+    [viewController viewDidAppear:NO];
+    self.currentViewController = viewController;
+}
+
+-(void)viewDidLoad{
+
     // Add Left swipe gesture
     UISwipeGestureRecognizer *leftSwipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(hideMenu:)];
     leftSwipe.direction = UISwipeGestureRecognizerDirectionLeft;

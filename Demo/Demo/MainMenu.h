@@ -3,7 +3,7 @@
 //  Demo
 //
 //  Created by Neil Ang on 9/11/11.
-//  Copyright (c) 2011 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2011 neilang.com. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
