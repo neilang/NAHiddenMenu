@@ -11,13 +11,14 @@
 @interface NAHiddenMenuController : UIViewController<UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, assign, readonly) UIViewController *currentViewController;
-@property (nonatomic, copy, readonly)   NSArray          *viewControllers;
 @property (nonatomic, assign, readonly) BOOL              isAnimating;
 @property (nonatomic, assign, readonly) BOOL              isMenuVisible;
 
 - (id)initWithViewControllers:(NSArray *)viewControllers;
 - (IBAction)showMenu:(id)sender;
-- (void)setRootViewController:(UIViewController *)viewController animated:(BOOL)animated;
+-(IBAction)hideMenu:(id)sender;
+- (void)hideMenuWithDelay:(NSTimeInterval)delay;
+- (void)setRootViewController:(UIViewController *)viewController;
 
 @end
 

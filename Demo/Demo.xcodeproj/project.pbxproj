@@ -15,6 +15,7 @@
 		285A005C14615BB300EB3E4F /* NAAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A005B14615BB300EB3E4F /* NAAppDelegate.m */; };
 		285A006D14615C3000EB3E4F /* SampleTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A006C14615C3000EB3E4F /* SampleTableViewController.m */; };
 		285A007114615C4300EB3E4F /* NAHiddenMenuController.m in Sources */ = {isa = PBXBuildFile; fileRef = 285A007014615C4300EB3E4F /* NAHiddenMenuController.m */; };
+		B37F6F8D1469FE0C00FEC3B4 /* SampleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B37F6F8C1469FE0C00FEC3B4 /* SampleViewController.m */; };
 		B3C5D16D146205F500FE661D /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5D16C146205F500FE661D /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
@@ -33,6 +34,8 @@
 		285A006C14615C3000EB3E4F /* SampleTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleTableViewController.m; sourceTree = "<group>"; };
 		285A006F14615C4300EB3E4F /* NAHiddenMenuController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NAHiddenMenuController.h; sourceTree = "<group>"; };
 		285A007014615C4300EB3E4F /* NAHiddenMenuController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NAHiddenMenuController.m; sourceTree = "<group>"; };
+		B37F6F8B1469FE0C00FEC3B4 /* SampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SampleViewController.h; sourceTree = "<group>"; };
+		B37F6F8C1469FE0C00FEC3B4 /* SampleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SampleViewController.m; sourceTree = "<group>"; };
 		B3C5D16C146205F500FE661D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -88,6 +91,8 @@
 				285A005214615BB300EB3E4F /* Supporting Files */,
 				285A006B14615C3000EB3E4F /* SampleTableViewController.h */,
 				285A006C14615C3000EB3E4F /* SampleTableViewController.m */,
+				B37F6F8B1469FE0C00FEC3B4 /* SampleViewController.h */,
+				B37F6F8C1469FE0C00FEC3B4 /* SampleViewController.m */,
 			);
 			path = Demo;
 			sourceTree = "<group>";
@@ -179,6 +184,7 @@
 				285A005C14615BB300EB3E4F /* NAAppDelegate.m in Sources */,
 				285A006D14615C3000EB3E4F /* SampleTableViewController.m in Sources */,
 				285A007114615C4300EB3E4F /* NAHiddenMenuController.m in Sources */,
+				B37F6F8D1469FE0C00FEC3B4 /* SampleViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

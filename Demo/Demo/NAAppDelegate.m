@@ -9,6 +9,7 @@
 #import "NAAppDelegate.h"
 #import "NAHiddenMenuController.h"
 #import "SampleTableViewController.h"
+#import "SampleViewController.h"
 
 @implementation NAAppDelegate
 
@@ -18,18 +19,22 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    UIViewController * sample1 = [[UIViewController alloc] init];
+    SampleViewController * sample1 = [[SampleViewController alloc] init];
     sample1.title = @"Sample 1";
     sample1.view.backgroundColor = [UIColor redColor];
     
-    UIViewController * sample2 = [[UIViewController alloc] init];
+    SampleViewController * sample2 = [[SampleViewController alloc] init];
     sample2.title = @"Sample 2";
     sample2.view.backgroundColor = [UIColor blueColor];
+    
+   
     
     SampleTableViewController * sampleTable = [[SampleTableViewController alloc] init];
     sampleTable.title = @"Sample Table";
     
-    NSArray * viewControllers = [NSArray arrayWithObjects:sample1, sample2, sampleTable, nil];
+    UINavigationController * navController = [[UINavigationController alloc] initWithRootViewController:sampleTable];
+    
+    NSArray * viewControllers = [NSArray arrayWithObjects:sample1, sample2, navController, nil];
     
     NAHiddenMenuController * rootViewController = [[NAHiddenMenuController alloc] initWithViewControllers:viewControllers];
     

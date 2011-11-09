@@ -8,16 +8,17 @@
 #import "NAHiddenMenuController.h"
 #import <QuartzCore/QuartzCore.h>
 
+#ifndef __IPHONE_5_0
+#warning "NAHiddenMenuController uses features only available in iOS SDK 5.0 and later."
+#endif
 
 #define HIDDEN_MENU_WIDTH 280.0f 
-#define MENU_BAR_OFFSET 20.0
 #define REVEAL_ANIMATION_SPEED 0.4f
 #define HIDE_MENU_DELAY 0.2f
 #define CONTAINER_SHADOW_WIDTH 10.0
 
 @interface NAHiddenMenuController()
 @property (nonatomic, assign, readwrite) UIViewController *currentViewController;
-@property (nonatomic, copy, readwrite)   NSArray          *viewControllers;
 @property (nonatomic, retain)            UITableView      *tableView;
 @property (nonatomic, retain)            UIView           *containerView;
 @property (nonatomic, retain)            UIView           *touchView;
@@ -25,11 +26,9 @@
 @property (nonatomic, assign, readwrite) BOOL              isMenuVisible;
 @end
 
-
 @implementation NAHiddenMenuController
 
 @synthesize currentViewController = _currentViewController;
-@synthesize viewControllers       = _viewControllers;
 @synthesize containerView         = _containerView;
 @synthesize touchView             = _touchView;
 @synthesize isAnimating           = _isAnimating;
@@ -40,43 +39,28 @@
     
     assert([viewControllers count] > 0);
     
-    self = [super init];
+    self = [super initWithNibName:nil bundle:nil];
     if (self) {
         
         self.currentViewController = nil;
         
-        // Each viewController must have a UINavigationBar, so they are checked and added
-        NSMutableArray *menuViewControllers = [[NSMutableArray alloc] initWithArray:viewControllers];
-        
-        for (size_t i = 0; i < [menuViewControllers count]; i++) {
-            UIViewController *viewController = [menuViewControllers objectAtIndex:i];
-            if (viewController.navigationController == nil) {
-                UINavigationController * navController = [[UINavigationController alloc] initWithRootViewController:viewController];
-                [menuViewControllers replaceObjectAtIndex:i withObject:navController];
-                
-                #if !__has_feature(objc_arc)
-                [navController release];
-                #endif
-            }
-                        
-            // TODO: change this icon
-            viewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(showMenu:)];
+        // Make each view controller a child of this view controller
+        for (UIViewController *viewController in viewControllers) {
+            [self addChildViewController:viewController];
+            [viewController didMoveToParentViewController:self];
+            
+            CGRect frame = viewController.view.frame;
+            frame.origin = CGPointZero;
+            viewController.view.frame = frame;
         }
         
-        self.viewControllers = menuViewControllers;
-        
-        #if !__has_feature(objc_arc)
-        [menuViewControllers release];
-        #endif
-        
         // Add the table view (which will display the menu)
-        
         CGRect tableViewFrame = self.view.frame;
         tableViewFrame.origin.x = 0.0f;
         tableViewFrame.origin.y = 0.0f;
         tableViewFrame.size.width = HIDDEN_MENU_WIDTH;
         
-        UITableView *tableView = [[UITableView alloc] initWithFrame:tableViewFrame];
+        UITableView *tableView     = [[UITableView alloc] initWithFrame:tableViewFrame];
         tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
         tableView.dataSource = self;
@@ -90,24 +74,24 @@
 
         [self.view addSubview:self.tableView];
 
+        
         // Add a container view to display the current view controllers view
-        
-        CGRect containerViewFrame = self.view.frame;
-        
-        containerViewFrame.origin.x = tableViewFrame.size.width;
-        containerViewFrame.size.height = containerViewFrame.size.height + MENU_BAR_OFFSET;
-        containerViewFrame.origin.y = -MENU_BAR_OFFSET;
+        CGRect containerViewFrame   = self.view.frame;
+        containerViewFrame.origin   = CGPointZero;
+        containerViewFrame.origin.x = HIDDEN_MENU_WIDTH;
         
         UIView *containerView = [[UIView alloc] initWithFrame:containerViewFrame];
         self.containerView = containerView;
         self.containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self.containerView.autoresizesSubviews = YES;
+        self.containerView.backgroundColor = [UIColor yellowColor];
+        
         
         #if !__has_feature(objc_arc)
         [containerView release];
         #endif
         
         // Give the container view a subtle shadow
-        
         CAGradientLayer *containerShadow = [[CAGradientLayer alloc] init];
         
         containerShadow.frame      = CGRectMake(-CONTAINER_SHADOW_WIDTH, 0, CONTAINER_SHADOW_WIDTH, self.containerView.frame.size.height);
@@ -132,20 +116,26 @@
         
         [self.view addSubview:touchView];
         
-        // Select the first row to fake the initial selection
-        self.isMenuVisible = NO;
+        self.isMenuVisible = YES;
         self.isAnimating   = NO;
+
+        // Load the first view controller
+        UIViewController * vc = [self.childViewControllers objectAtIndex:0];
+        [vc viewWillAppear:NO];
+        [self.containerView addSubview:vc.view];
+        [vc viewDidAppear:NO];
+        
+        self.currentViewController = vc;
+        
+        // Select the first row to fake the initial selection
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
         [tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionTop];
-
-        // Load the first view controller, but also reveal the menu
-        UIViewController * vc = [self.viewControllers objectAtIndex:0];
-        [self setRootViewController:vc animated:NO];
-        [self showMenu:nil];
         
     }
     return self;
 }
+
+
 
 -(void)viewDidLoad{
     
@@ -185,19 +175,17 @@
     }];
 }
 
-- (IBAction)hideMenu:(id)sender{
-
+- (void)hideMenuWithDelay:(NSTimeInterval)delay{
+    
     if(self.isAnimating) return;
     if(!self.isMenuVisible) return;
 
     self.isMenuVisible = NO;
     self.isAnimating   = YES;
-
     
     self.touchView.hidden = YES;
     
     // When closing the menu there should only be a delay when a new table row is selected
-    float delay = sender == self.tableView ? HIDE_MENU_DELAY : 0.0;
     
     [UIView animateWithDuration:REVEAL_ANIMATION_SPEED delay:delay options:UIViewAnimationCurveLinear animations:^{
         CGRect frame = self.containerView.frame;
@@ -208,50 +196,32 @@
     }];
 }
 
-- (void)setRootViewController:(UIViewController *)viewController animated:(BOOL)animated{
+-(IBAction)hideMenu:(id)sender {
+    [self hideMenuWithDelay:0.0f];
+}
+
+- (void)setRootViewController:(UIViewController *)viewController{
     
-    id sender = nil; 
+    if (viewController == self.currentViewController) {
+        [self hideMenu:nil];
+        return;
+    }
     
-    if (viewController != self.currentViewController) {
-        
-        // Remove the old subview
-        
-        [self.currentViewController viewWillDisappear:animated];
-        
-        for (UIView *view in self.containerView.subviews) {
-            [view removeFromSuperview];
-        }
-        
-        [self.currentViewController viewDidDisappear:animated];
-        
-        // Add the new subview
-        
-        [viewController viewWillAppear:YES];
-        [self.containerView addSubview:viewController.view];
-        [viewController viewDidAppear:YES];
-        
-        // Keep a reference to the current vc
+    // Reset the view frame
+    CGRect frame = self.currentViewController.view.frame;
+    frame.origin = CGPointZero;
+    viewController.view.frame = frame;
+    
+    // Perform the view transition
+    [self transitionFromViewController:self.currentViewController toViewController:viewController duration:0.0f options:UIViewAnimationOptionTransitionNone animations:nil completion:^(BOOL finished){
         self.currentViewController = viewController;
-        
-        // Assume that this was set by selecting a new row in the menu
-        sender = self.tableView;
-    }
-    
-    if(animated){
-        [self hideMenu:sender];
-    }
-    else{
-        CGRect frame = self.containerView.frame;
-        frame.origin.x = 0.0f;
-        self.containerView.frame = frame;
-    }
-    
+        [self hideMenuWithDelay:HIDE_MENU_DELAY]; // hide the menu with delay
+    }];
 }
 
 #if !__has_feature(objc_arc)
 - (void)dealloc {
     
-    [_viewControllers release]; _viewControllers = nil;
     [_containerView release]; _containerView = nil;
     [_touchView release]; _touchView = nil;
     [_tableView release]; _tableView = nil;
@@ -269,7 +239,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self.viewControllers count];
+    return [self.childViewControllers count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -280,7 +250,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    UIViewController *vc = (UIViewController *)[self.viewControllers objectAtIndex:indexPath.row];
+    UIViewController *vc = (UIViewController *)[self.childViewControllers objectAtIndex:indexPath.row];
     cell.textLabel.text = vc.title;
     
     return cell;
@@ -290,8 +260,10 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UIViewController *vc = (UIViewController *)[self.viewControllers objectAtIndex:indexPath.row];  
-    [self setRootViewController:vc animated:YES];
+    UIViewController *vc = (UIViewController *)[self.childViewControllers objectAtIndex:indexPath.row];  
+    
+    [self setRootViewController:vc];
+    
 }
 
 #pragma mark - UIViewControllerRotation
@@ -325,7 +297,6 @@
 @end
 
 #undef HIDDEN_MENU_WIDTH
-#undef MENU_BAR_OFFSET
 #undef REVEAL_ANIMATION_SPEED
 #undef CONTAINER_SHADOW_WIDTH
 #undef HIDE_MENU_DELAY
