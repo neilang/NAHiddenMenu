@@ -7,18 +7,19 @@
 
 #import <Foundation/Foundation.h>
 
+@class NAHiddenMenuController;
+
 // The menu is a custom table view, and the following selectors are required to make it work
 @protocol NAHiddenMenuDelegate <NSObject>
 
 @required
 
-// Return the view controller to be presented when a menu row is tapped, or nil if you wish to implement your own action.
--(UIViewController *)tableView:(UITableView *)tableView viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath;
+// Return the view controller to be presented when a menu row is tapped, or nil.
+-(UIViewController *)hiddenMenu:(NAHiddenMenuController *)hiddenMenu viewControllerForRowAtIndexPath:(NSIndexPath *)indexPath;
 
 // The default view controller to show on startup. This cannot be nil.
--(UIViewController *)defualtViewController;
+-(UIViewController *)defualtViewControllerForHiddenMenu:(NAHiddenMenuController *)hiddenMenu;
 
-@optional
 
 // Re-implementation of UITableViewDataSource protocol
 @required

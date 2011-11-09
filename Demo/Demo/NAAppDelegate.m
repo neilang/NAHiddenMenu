@@ -22,10 +22,6 @@
     MainMenu *menu  = [[MainMenu alloc] init];
     NAHiddenMenuController *hiddenMenuController = [[NAHiddenMenuController alloc] initWithDelegate:menu];
     
-    // Set the first selected item
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [hiddenMenuController.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionTop];
-    
     self.window.rootViewController = hiddenMenuController;
     [self.window makeKeyAndVisible];
     return YES;

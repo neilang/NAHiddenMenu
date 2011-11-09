@@ -37,7 +37,6 @@
 @synthesize hiddenMenuDelegate    = _hiddenMenuDelegate;
 
 - (id)initWithDelegate:(id<NAHiddenMenuDelegate>)delegate {
-    
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         self.hiddenMenuDelegate    = delegate;
@@ -95,10 +94,14 @@
     [super viewWillAppear:animated];
     
     // Set the default view controller
+    UIViewController * viewController = [self.hiddenMenuDelegate defualtViewControllerForHiddenMenu:self];
+    
+    // A default view controller is always required
+    assert(viewController);
+    
     CGRect frame = self.containerView.frame;
     frame.origin = CGPointZero;
-    UIViewController * viewController = [self.hiddenMenuDelegate defualtViewController];
-    viewController.view.frame         = frame;
+    viewController.view.frame = frame;
     
     [self addChildViewController:viewController];
     [viewController didMoveToParentViewController:self];
@@ -217,7 +220,7 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    UIViewController *viewController = [self.hiddenMenuDelegate tableView:tableView viewControllerForRowAtIndexPath:indexPath];
+    UIViewController *viewController = [self.hiddenMenuDelegate hiddenMenu:self viewControllerForRowAtIndexPath:indexPath];
     
     if (viewController) {
         [self setRootViewController:viewController];
